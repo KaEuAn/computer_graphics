@@ -1,4 +1,4 @@
-// Include standard headers
+ï»¿// Include standard headers
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -16,12 +16,12 @@ using namespace glm;
 #include <common/shader.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-int main( void )
+int main(void)
 {
 	// Initialise GLFW
-	if( !glfwInit() )
+	if (!glfwInit())
 	{
-		fprintf( stderr, "Failed to initialize GLFW\n" );
+		fprintf(stderr, "Failed to initialize GLFW\n");
 		getchar();
 		return -1;
 	}
@@ -34,8 +34,8 @@ int main( void )
 
 	// Open a window and create its OpenGL context
 	window = glfwCreateWindow(2560, 1440, "Two triangles", NULL, NULL);
-	if( window == NULL ){
-		fprintf( stderr, "Failed to open GLFW window. If you have an Intel GPU, they are not 3.3 compatible. Try the 2.1 version of the tutorials.\n" );
+	if (window == NULL) {
+		fprintf(stderr, "Failed to open GLFW window. If you have an Intel GPU, they are not 3.3 compatible. Try the 2.1 version of the tutorials.\n");
 		getchar();
 		glfwTerminate();
 		return -1;
@@ -55,7 +55,7 @@ int main( void )
 	glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
 
 	// Dark blue background
-	glClearColor(0.0f, 0.0f, 0.05f, 0.0f);
+	glClearColor(0.0f, 0.0f, 0.15f, 0.0f);
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -68,7 +68,7 @@ int main( void )
 	GLuint programID[] = {
 	LoadShaders("SimpleTransform.vertexshader", "SimpleFragmentShader.fragmentshader"),
 	LoadShaders("SimpleTransform.vertexshader", "SimpleFragmentShader2.fragmentshader"),
-};
+	};
 
 	// Get a handle for our "MVP" uniform
 	GLuint MatrixID[] = {
@@ -77,10 +77,10 @@ int main( void )
 
 	};
 
-	// Projection matrix : 90° Field of View, 16:9 ratio, display range : 0.1 unit <-> 100 units
+	// Projection matrix : 90 Field of View, 16:9 ratio, display range : 0.1 unit <-> 100 units
 	glm::mat4 Projection = glm::perspective(glm::radians(90.0f), 16.0f / 9.0f, 0.1f, 100.0f);
 
-	
+
 	// Model matrix : an identity matrix (model will be at the origin)
 	glm::mat4 Model = glm::mat4(1.0f);
 
@@ -101,10 +101,10 @@ int main( void )
 
 	double angle = 0;
 
-	do{
+	do {
 
 		// Clear the screen
-		glClear( GL_COLOR_BUFFER_BIT );
+		glClear(GL_COLOR_BUFFER_BIT);
 
 		// Camera matrix
 		glm::mat4 View = glm::lookAt(
@@ -149,8 +149,8 @@ int main( void )
 		angle += 0.01;
 
 	} // Check if the ESC key was pressed or the window was closed
-	while( glfwGetKey(window, GLFW_KEY_ESCAPE ) != GLFW_PRESS &&
-		   glfwWindowShouldClose(window) == 0 );
+	while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
+		glfwWindowShouldClose(window) == 0);
 
 	// Cleanup VBO
 	glDeleteBuffers(1, &vertexbuffer);
@@ -164,4 +164,3 @@ int main( void )
 
 	return 0;
 }
-
