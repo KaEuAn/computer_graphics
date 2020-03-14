@@ -32,7 +32,7 @@ int main( void )
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	// Open a window and create its OpenGL context
-	window = glfwCreateWindow(2560, 1400, "2 triangles", NULL, NULL);
+	window = glfwCreateWindow(2560, 1440, "Two triangles", NULL, NULL);
 	if( window == NULL ){
 		fprintf( stderr, "Failed to open GLFW window. If you have an Intel GPU, they are not 3.3 compatible. Try the 2.1 version of the tutorials.\n" );
 		getchar();
@@ -54,7 +54,10 @@ int main( void )
 	glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
 
 	// Dark blue background
-	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
+	glClearColor(0.0f, 0.0f, 0.05f, 0.0f);
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	GLuint VertexArrayID;
 	glGenVertexArrays(1, &VertexArrayID);
@@ -62,18 +65,19 @@ int main( void )
 
 	// Create and compile our GLSL program from the shaders
 	GLuint programID[] = {
-		LoadShaders("SimpleVertexShader.vertexshader", "SimpleFragmentShader.fragmentshader"),
+	LoadShaders("SimpleVertexShader.vertexshader", "SimpleFragmentShader.fragmentshader"),
 		LoadShaders("SimpleVertexShader.vertexshader", "SimpleFragmentShader2.fragmentshader"),
-	};
+};
+
 
 
 	static const GLfloat g_vertex_buffer_data[] = {
 		-0.4f, -0.8f, 0.0f,
 		 0.4f, -0.8f, 0.0f,
-		 0.0f,  0.0f, 0.0f,
+		 0.0f,  0.1f, 0.0f,
 		-0.4f,  0.8f, 0.0f,
 		 0.4f,  0.8f, 0.0f,
-		 0.0f,  0.0f, 0.0f,
+		 0.0f, -0.1f, 0.0f,
 	};
 
 	GLuint vertexbuffer;
@@ -120,6 +124,7 @@ int main( void )
 	// Cleanup VBO
 	glDeleteBuffers(1, &vertexbuffer);
 	glDeleteVertexArrays(1, &VertexArrayID);
+
 	glDeleteProgram(programID[0]);
 	glDeleteProgram(programID[1]);
 
