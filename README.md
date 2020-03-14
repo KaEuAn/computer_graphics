@@ -1,0 +1,1 @@
+Repository for hometasks for computer graphics course at MIPT, 8 semester
