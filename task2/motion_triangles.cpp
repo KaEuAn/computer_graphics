@@ -125,7 +125,7 @@ int main( void )
 
 			// 1rst attribute buffer : vertices
 			glEnableVertexAttribArray(0);
-			glUniformMatrix4fv(MatrixID[0], 1, GL_FALSE, &MVP[0][0]);
+			glUniformMatrix4fv(MatrixID[i], 1, GL_FALSE, &MVP[0][0]);
 			glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
 			glVertexAttribPointer(
 				0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
