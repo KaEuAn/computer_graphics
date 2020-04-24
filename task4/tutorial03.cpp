@@ -232,11 +232,14 @@ public:
     ~Player() override = default;
 
     Object* Act(const std::vector<Object*>& objects) override {
+        int window_width, window_height;
+        glfwGetWindowSize(window, &window_width, &window_height);
+
         double xpos, ypos;
         glfwGetCursorPos(window, &xpos, &ypos);
-        glfwSetCursorPos(window, 1024 / 2, 768 / 2);
-        horizontal_angle_ += mouse_speed_ * GLfloat(1024 / 2 - xpos);
-        vertical_angle_ += mouse_speed_ * GLfloat(768 / 2 - ypos);
+        glfwSetCursorPos(window, window_width / 2, window_height / 2);
+        horizontal_angle_ += mouse_speed_ * GLfloat(window_width / 2 - xpos);
+        vertical_angle_ += mouse_speed_ * GLfloat(window_height / 2 - ypos);
 
         if (vertical_angle_ > 3.14f / 2.0f) {
             vertical_angle_ = 3.14f / 2.0f;
@@ -427,7 +430,7 @@ int main() {
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    window = glfwCreateWindow(1024, 768, "Attack on zombie monkeys", nullptr, nullptr);
+    window = glfwCreateWindow(1366, 768, "Attack on zombie monkeys", nullptr, nullptr);
     if (window == nullptr) {
         fprintf(stderr, "Failed to open GLFW window.\n");
         getchar();
@@ -448,7 +451,7 @@ int main() {
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     glfwPollEvents();
-    glfwSetCursorPos(window, 1024 / 2, 768 / 2);
+    glfwSetCursorPos(window, 1366 / 2, 768 / 2);
 
     glClearColor(0.00f, 191 / 255.f, 1.0f, 0.0f);
 
