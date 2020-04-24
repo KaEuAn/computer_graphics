@@ -252,7 +252,7 @@ public:
 
         glm::vec3 camera_direction = CameraDirection();
 
-        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT); == GLFW_PRESS) {
+        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
             if (glfwGetTime() > next_projectile_) {
                 next_projectile_ = glfwGetTime() + cooldown_;
                 FireBall* new_proj = new FireBall(position_ + camera_direction * (box_ + 0.2f),
@@ -286,7 +286,7 @@ public:
         if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
             final_direction += up;
         }
-        if (glfwGetKey(window, GLFW_KEY_CONTROL) == GLFW_PRESS) {
+        if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
             final_direction -= up;
         }
         if( glm::length( final_direction ) > 0.0f ) {
@@ -482,7 +482,6 @@ int main() {
 
     glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-    glfwSetMouseButtonCallback(window, mouse_button_callback);
 
     glfwPollEvents();
     glfwSetCursorPos(window, 1366 / 2, 768 / 2);
