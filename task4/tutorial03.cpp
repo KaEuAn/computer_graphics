@@ -232,6 +232,7 @@ public:
     ~Player() override = default;
 
     Object* Act(const std::vector<Object*>& objects) override {
+
         int window_width, window_height;
         glfwGetWindowSize(window, &window_width, &window_height);
 
@@ -251,7 +252,7 @@ public:
 
         glm::vec3 camera_direction = CameraDirection();
 
-        if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT); == GLFW_PRESS) {
             if (glfwGetTime() > next_projectile_) {
                 next_projectile_ = glfwGetTime() + cooldown_;
                 FireBall* new_proj = new FireBall(position_ + camera_direction * (box_ + 0.2f),
@@ -266,24 +267,32 @@ public:
             cos( horizontal_angle_ )
         );
         glm::vec3 right = CameraRight();
+        glm::vec3 up = CameraUp();
         glm::vec3 final_direction = glm::vec3( 0.0f, 0.0f, 0.0f );
-        if( glfwGetKey( window, GLFW_KEY_W ) == GLFW_PRESS ) {
-            final_direction += direction;
+
+
+        if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+            final_direction += direction * deltaTime * speed;
         }
-        if( glfwGetKey( window, GLFW_KEY_S ) == GLFW_PRESS ) {
+        if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
             final_direction -= direction;
         }
-        if( glfwGetKey( window, GLFW_KEY_D ) == GLFW_PRESS ) {
+        if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
             final_direction += right;
         }
-        if( glfwGetKey( window, GLFW_KEY_A ) == GLFW_PRESS ) {
+        if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
             final_direction -= right;
+        }
+        if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+            final_direction += up;
+        }
+        if (glfwGetKey(window, GLFW_KEY_CONTROL) == GLFW_PRESS) {
+            final_direction -= up;
         }
         if( glm::length( final_direction ) > 0.0f ) {
             final_direction /= glm::length( final_direction );
         }
         direction_ = final_direction;
-
         return nullptr;
     }
 
@@ -473,6 +482,7 @@ int main() {
 
     glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetMouseButtonCallback(window, mouse_button_callback);
 
     glfwPollEvents();
     glfwSetCursorPos(window, 1366 / 2, 768 / 2);
