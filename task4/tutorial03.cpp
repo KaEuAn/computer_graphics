@@ -465,9 +465,7 @@ int main() {
     GLuint simpleProgramID = LoadShaders("ColorVertex.vertexshader", "ColorFragment.fragmentshader");
 
     GLuint SimpleTextureID = glGetUniformLocation(simpleProgramID, "TextureSampler");
-    GLuint SimpleProjectionID = glGetUniformLocation(simpleProgramID, "Projection");
-    GLuint SimpleViewID = glGetUniformLocation(simpleProgramID, "View");
-    GLuint SimpleModelID = glGetUniformLocation(simpleProgramID, "Model");
+    GLuint SimpleMVPID = glGetUniformLocation(simpleProgramID, "MVP");
 
     GLuint vertexbuffer;
     glGenBuffers(1, &vertexbuffer);
@@ -557,9 +555,6 @@ int main() {
 
         glUseProgram(simpleProgramID);
 
-        glUniformMatrix4fv(SimpleProjectionID, 1, GL_FALSE, &Projection[0][0]);
-        glUniformMatrix4fv(SimpleViewID, 1, GL_FALSE, &View[0][0]);
-
         for (Object* obj : objects) {
             glm::mat4 Scale = glm::scale(glm::mat4(), glm::vec3(obj->Box(), obj->Box(), obj->Box()) / 1.5f);
             glm::mat4 Translate = glm::translate(glm::mat4(), obj->Position());
@@ -573,7 +568,9 @@ int main() {
             glm::mat4 Rotate = glm::rotate(glm::mat4(), std::atan2(sin_value, cos_value), up);
 
             glm::mat4 Model = Translate * Rotate * Scale;
-            glUniformMatrix4fv(SimpleModelID, 1, GL_FALSE, &Model[0][0]);
+
+            glm::mat4 MVP = Projection * View * Model;
+            glUniformMatrix4fv(SimpleMVPID, 1, GL_FALSE, &MVP[0][0]);
 
             obj->Draw(SimpleTextureID, vertexbuffer, uvbuffer, normalbuffer);
 
