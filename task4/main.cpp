@@ -272,7 +272,7 @@ public:
 
 
         if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-            final_direction += direction * deltaTime * speed;
+            final_direction += direction;
         }
         if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
             final_direction -= direction;
