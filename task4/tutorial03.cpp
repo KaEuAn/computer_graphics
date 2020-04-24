@@ -260,6 +260,30 @@ public:
             }
         }
 
+        glm::vec3 direction(
+            sin( horizontal_angle_ ),
+            0.0f,
+            cos( horizontal_angle_ )
+        );
+        glm::vec3 right = CameraRight();
+        glm::vec3 final_direction = glm::vec3( 0.0f, 0.0f, 0.0f );
+        if( glfwGetKey( window, GLFW_KEY_W ) == GLFW_PRESS ) {
+            final_direction += direction;
+        }
+        if( glfwGetKey( window, GLFW_KEY_S ) == GLFW_PRESS ) {
+            final_direction -= direction;
+        }
+        if( glfwGetKey( window, GLFW_KEY_D ) == GLFW_PRESS ) {
+            final_direction += right;
+        }
+        if( glfwGetKey( window, GLFW_KEY_A ) == GLFW_PRESS ) {
+            final_direction -= right;
+        }
+        if( glm::length( final_direction ) > 0.0f ) {
+            final_direction /= glm::length( final_direction );
+        }
+        direction_ = final_direction;
+
         return nullptr;
     }
 
