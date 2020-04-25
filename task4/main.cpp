@@ -12,7 +12,7 @@
 
 #include <GL/glew.h>
 
-#include <glfw3.h>
+#include <GLFW/glfw3.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -241,7 +241,7 @@ class FireBall : public Object {
 public:
     explicit FireBall(const glm::vec3& position, const glm::vec3& direction, GLfloat box = 0.1f,
         GLfloat damage = 1.0f, GLfloat speed = 10.0f, GLfloat tl = 10.0f)
-        : Object(position, direction, box, speed, "bullet.obj", {"fire.bmp"}),
+        : Object(position, direction, box, speed, "bullet.obj", { "fire.bmp" }),
         damage_(damage), end_time_(glfwGetTime() + tl) {}
 
     ~FireBall() override = default;
@@ -645,7 +645,7 @@ int main() {
             GLfloat sin_value = glm::dot(glm::cross(base_direction, direction), up);
             GLfloat cos_value = glm::dot(base_direction, direction);
 
-            glm::mat4 Rotate = glm::rotate(glm::mat4(), std::atan2(sin_value, cos_value), up);
+            glm::mat4 Rotate = glm::rotate(glm::mat4(), std::atan2(sin_value, cos_value) - 1.65f, up);
 
             glm::mat4 Model = Translate * Rotate * Scale;
 
@@ -654,13 +654,13 @@ int main() {
 
             auto casted_obj = dynamic_cast<Enemy*>(obj);
             if (casted_obj != nullptr) {
-                casted_obj->Draw({ SimpleTextureID1, SimpleTextureID2, SimpleTextureID3, SimpleTextureID4}, vertexbuffer, uvbuffer, normalbuffer);
+                casted_obj->Draw({ SimpleTextureID1, SimpleTextureID2, SimpleTextureID3, SimpleTextureID4 }, vertexbuffer, uvbuffer, normalbuffer);
             }
             else {
                 obj->Draw({ SimpleTextureID }, vertexbuffer, uvbuffer, normalbuffer);
             }
 
-            
+
 
         }
 
