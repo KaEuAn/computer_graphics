@@ -52,6 +52,7 @@ public:
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture_[0]);
+
         glUniform1i(texture_ids[0], 0);
 
         glEnableVertexAttribArray(0);
@@ -501,6 +502,7 @@ int main() {
         getchar();
         return -1;
     }
+    std::vector<Object*> objects_for_delete;
 
     glfwWindowHint(GLFW_SAMPLES, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -510,7 +512,7 @@ int main() {
 
     int width = 3840, height = 2160;
 
-    window = glfwCreateWindow(width, height, "Attack on zombie monkeys", nullptr, nullptr);
+    window = glfwCreateWindow(width, height, "circus", nullptr, nullptr);
     if (window == nullptr) {
         fprintf(stderr, "Failed to open GLFW window.\n");
         getchar();
@@ -533,7 +535,7 @@ int main() {
     glfwPollEvents();
     glfwSetCursorPos(window, width / 2, height / 2);
 
-    glClearColor(0.00f, 191 / 255.f, 1.0f, 0.0f);
+    glClearColor(0.00f, 190 / 255.f, 1.0f, 0.0f);
 
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
@@ -605,13 +607,12 @@ int main() {
         }
 
         std::vector<Object*> new_objects;
-
         for (size_t i = 0; i < objects.size(); ++i) {
             if (remains[i]) {
                 new_objects.push_back(objects[i]);
             }
             else {
-                delete objects[i];
+                objects_for_delete.push_back(objects[i]);
             }
         }
 
@@ -624,7 +625,6 @@ int main() {
                 act_objects.push_back(new_obj);
             }
         }
-
         objects = act_objects;
 
         Object* new_obj = enemy_creator.CreateEnemy(player->Position(), objects);
@@ -659,14 +659,14 @@ int main() {
             glUniformMatrix4fv(SimpleMVPID, 1, GL_FALSE, &MVP[0][0]);
 
             auto casted_obj = dynamic_cast<Enemy*>(obj);
+
             if (casted_obj != nullptr) {
                 casted_obj->Draw({ SimpleTextureID1, SimpleTextureID2, SimpleTextureID3, SimpleTextureID4 }, vertexbuffer, uvbuffer, normalbuffer);
+                
             }
             else {
                 obj->Draw({ SimpleTextureID }, vertexbuffer, uvbuffer, normalbuffer);
             }
-
-
 
         }
 
@@ -685,6 +685,9 @@ int main() {
     glDeleteBuffers(1, &normalbuffer);
     glDeleteProgram(simpleProgramID);
     glDeleteVertexArrays(1, &VertexArrayID);
+    for (int i = 0; i < objects_for_delete.size(); ++i) {
+        delete objects_for_delete[i];
+    }
 
     glfwTerminate();
 
