@@ -152,7 +152,7 @@ protected:
 class Floor : public Object {
 public:
     explicit Floor(const glm::vec3& position)
-        : Object(position, glm::vec3(0.0f, 1.0f, 0.0f), 1000.0f, 0.0f, "floor.obj", { "blood.bmp" }) {}
+        : Object(position, glm::vec3(0.0f, 1.0f, 0.0f), 1000.0f, 0.0f, "floor.obj", { "dog.bmp" }) {}
 
     ~Floor() override = default;
 
@@ -171,7 +171,7 @@ class Actor : public Object {
 public:
     explicit Actor(const glm::vec3& position, GLfloat box, GLfloat hp, GLfloat speed,
         const glm::vec3& direction)
-        : Object(position, direction, box, speed, "Wolf_One_obj.obj", { "Wolf_Fur.bmp", "Wolf_Body.bmp", "Wolf_Eyes_1.bmp", "Wolf_Eyes_2.bmp" }), hp_(hp) {}
+        : Object(position, direction, box, speed, "Wolf_obj.obj", { "Wolf_Body.bmp", "Wolf_Fury.bmp", "Wolf_Fury.bmp", "Wolf_Fury.bmp" }), hp_(hp) {}
 
     ~Actor() override = default;
 
