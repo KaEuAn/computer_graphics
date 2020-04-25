@@ -12,7 +12,7 @@
 
 #include <GL/glew.h>
 
-#include <GLFW/glfw3.h>
+#include <glfw3.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -296,26 +296,21 @@ public:
             if (glfwGetTime() > next_projectile_) {
                 next_projectile_ = glfwGetTime() + cooldown_;
                 FireBall* new_proj = new FireBall(position_ + camera_direction * (box_ + 0.2f),
-                    camera_direction, 0.1f, 1.0f, 20.0);
+                    camera_direction, 0.1f, 2.0f, 20.0);
                 return new_proj;
             }
         }
 
-        glm::vec3 direction(
-            sin(horizontal_angle_),
-            0.0f,
-            cos(horizontal_angle_)
-        );
         glm::vec3 right = CameraRight();
         glm::vec3 up = CameraUp();
         glm::vec3 final_direction = glm::vec3(0.0f, 0.0f, 0.0f);
 
 
         if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-            final_direction += direction;
+            final_direction += camera_direction;
         }
         if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-            final_direction -= direction;
+            final_direction -= camera_direction;
         }
         if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
             final_direction += right;
@@ -354,6 +349,7 @@ bool Actor::Interact(Object* obj, const glm::vec3& old_position) {
         if (dynamic_cast<Floor*>(obj) != nullptr) {
             position_ = old_position;
         }
+        printf("HP: %f", hp_);
         return hp_ > 0.0f;
     }
     else {
@@ -395,7 +391,7 @@ bool Enemy::Interact(Object* obj, const glm::vec3& old_position) {
 }
 
 Object* Enemy::Act(const std::vector<Object*>& objects) {
-    Object* target = nullptr;
+    Player* target = nullptr;
 
     for (Object* obj : objects) {
         auto cast_obj = dynamic_cast<Player*>(obj);
@@ -406,7 +402,7 @@ Object* Enemy::Act(const std::vector<Object*>& objects) {
     }
 
     if (target != nullptr) {
-        glm::vec3 direction = target->Position() - position_;
+        glm::vec3 direction = target->Position() - position_ + 2.0f * target->CameraRight();
         if (glm::length(direction) > 0.0f) {
             direction /= glm::length(direction);
         }
@@ -466,7 +462,7 @@ public:
 
                 Object* new_obj = nullptr;
 
-                new_obj = new Enemy(new_position, orientation, 1.0f, hp_(rng_));
+                new_obj = new Enemy(new_position, orientation, 1.0f);
 
                 bool possible = true;
 
