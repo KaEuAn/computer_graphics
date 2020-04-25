@@ -232,7 +232,7 @@ public:
         glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
         glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
-        glDrawArrays(GL_TRIANGLES, 0, vertices_.size());
+        glDrawArrays(GL_CIRCULAR_CCW_ARC_TO_NV, 0, vertices_.size());
 
         glDisableVertexAttribArray(0);
         glDisableVertexAttribArray(1);
