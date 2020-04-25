@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include <string>
 #include <list>
 #include <vector>
@@ -12,7 +13,7 @@
 
 #include <GL/glew.h>
 
-#include <GLFW/glfw3.h>
+#include <glfw3.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -189,7 +190,7 @@ protected:
 class Enemy : public Actor {
 public:
     explicit Enemy(const glm::vec3& position, const glm::vec3& direction = glm::vec3(0.0f, 0.0f, 0.0f),
-        GLfloat box = 1.0f, GLfloat hp = 1.0f, GLfloat speed = 10.0f, GLfloat interact_damage = 1.0f)
+        GLfloat box = 1.0f, GLfloat hp = 1.0f, GLfloat speed = 7.5f, GLfloat interact_damage = 1.0f)
         : Actor(position, box, hp, speed, direction), interact_damage_(interact_damage) {}
 
     ~Enemy() override = default;
@@ -356,7 +357,6 @@ bool Actor::Interact(Object* obj, const glm::vec3& old_position) {
         if (dynamic_cast<Floor*>(obj) != nullptr) {
             position_ = old_position;
         }
-        printf("HP: %f", hp_);
         return hp_ > 0.0f;
     }
     else {
@@ -382,8 +382,8 @@ bool Enemy::Interact(Object* obj, const glm::vec3& old_position) {
         if (proj != nullptr) {
             ReceiveDamage(proj->DealDamage(this));
         }
-        if (dynamic_cast<Player*>(obj) != nullptr) {
-            auto player = dynamic_cast<Player*>(obj);
+        auto player = dynamic_cast<Player*>(obj);
+        if (player != nullptr) {
             player->ReceiveDamage(this->DealDamage(player));
             return false;
         }
@@ -409,7 +409,8 @@ Object* Enemy::Act(const std::vector<Object*>& objects) {
     }
 
     if (target != nullptr) {
-        glm::vec3 direction = target->Position() - position_ + 2.0f * target->CameraRight();
+        glm::vec3 true_direction = target->Position() - position_;
+        glm::vec3 direction = true_direction + 5.0f * glm::sin(glm::length(true_direction)) * target->CameraRight();
         if (glm::length(direction) > 0.0f) {
             direction /= glm::length(direction);
         }
@@ -431,7 +432,10 @@ Object* Floor::Act(const std::vector<Object*>& objects) {
         }
     }
     if (target != nullptr) {
-        position_ = target->Position() - glm::vec3(0.0f, target->Position().y, 0.0f);
+        glm::vec3 new_position = target->Position() - glm::vec3(0.0f, target->Position().y, 0.0f);
+        if (glm::distance(position_, new_position) > 900.0f) {
+            position_ = target->Position() - glm::vec3(0.0f, target->Position().y, 0.0f);
+        }
     }
     return nullptr;
 }
@@ -440,7 +444,7 @@ class EnemyCreator {
 public:
     explicit EnemyCreator(GLfloat cooldown = 3.0f, size_t retries = 10, GLfloat r_from = 30.0f,
         GLfloat r_to = 50.0f, GLfloat hp_from = 1.0f, GLfloat hp_to = 5.0f,
-        GLfloat speed_from = 1.0f, GLfloat speed_to = 5.0f)
+        GLfloat speed_from = 0.5f, GLfloat speed_to = 2.0f)
         : cooldown_(cooldown), rng_(std::random_device()()), retries_(retries), angle_(-3.14, 3.14),
         r_(r_from, r_to), hp_(hp_from, hp_to), speed_(speed_from, speed_to) {}
 
@@ -574,6 +578,8 @@ int main() {
     EnemyCreator enemy_creator;
 
     do {
+        auto loop_start = clock();
+
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         GLfloat current_time = glfwGetTime();
@@ -646,12 +652,12 @@ int main() {
             glm::mat4 Translate = glm::translate(glm::mat4(), obj->Position());
 
             glm::vec3 direction = obj->GetDirection();
-            glm::vec3 base_direction(1.0f, 0.0f, 0.0f);
+            glm::vec3 base_direction(0.0f, 0.0f, 1.0f);
             glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
             GLfloat sin_value = glm::dot(glm::cross(base_direction, direction), up);
             GLfloat cos_value = glm::dot(base_direction, direction);
 
-            glm::mat4 Rotate = glm::rotate(glm::mat4(), std::atan2(sin_value, cos_value) - 1.65f, up);
+            glm::mat4 Rotate = glm::rotate(glm::mat4(), std::atan2(sin_value, cos_value), up);
 
             glm::mat4 Model = Translate * Rotate * Scale;
 
@@ -667,11 +673,16 @@ int main() {
             else {
                 obj->Draw({ SimpleTextureID }, vertexbuffer, uvbuffer, normalbuffer);
             }
-
         }
 
         glfwSwapBuffers(window);
         glfwPollEvents();
+
+        auto loop_end = clock();
+
+        if (loop_end - loop_start < 17) {   // 60 fps
+            _sleep(17 - (loop_end - loop_start));
+        }
 
     } while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
         glfwWindowShouldClose(window) == 0);
