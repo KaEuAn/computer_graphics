@@ -197,7 +197,10 @@ public:
 
     Object* Act(const std::vector<Object*>& objects) override;
 
-    GLfloat DealDamage(Object* obj) { return interact_damage_; };
+    GLfloat DealDamage(Object* obj) {
+        printf("enemy damage");
+        return interact_damage_;
+    };
 
     virtual void Draw(const std::vector<GLuint>& texture_ids, GLuint vertexbuffer, GLuint uvbuffer, GLuint normalbuffer) override {
         glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
@@ -248,7 +251,10 @@ public:
 
     bool Interact(Object* obj, const glm::vec3& old_position) override;
 
-    GLfloat DealDamage(Object* obj) { return damage_; };
+    GLfloat DealDamage(Object* obj) {
+        printf("fireball damaged");
+        return damage_;
+    };
 
     bool CheckSelf() override { return glfwGetTime() < end_time_; }
 
