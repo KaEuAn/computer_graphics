@@ -12,7 +12,7 @@
 
 #include <GL/glew.h>
 
-#include <glfw3.h>
+#include <GLFW/glfw3.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -29,16 +29,21 @@ GLFWwindow* window;
 
 class LoadedModel {
 public:
-    explicit LoadedModel(const std::string& obj_file, const std::string& texture_file) {
-        texture_ = loadBMP_custom(texture_file.data());
+    explicit LoadedModel(const std::string& obj_file, const std::vector<std::string>& texture_file) {
+
+        for (int i = 0; i < texture_file.size(); ++i) {
+            texture_.push_back(loadBMP_custom(texture_file[i].data()));
+        }
         loadOBJ(obj_file.data(), vertices_, uvs_, normals_);
     }
 
     virtual ~LoadedModel() {
-        glDeleteTextures(1, &texture_);
+        for (int i = 0; i < texture_.size(); ++i) {
+            glDeleteTextures(1, &texture_[i]);
+        }
     }
 
-    virtual void Draw(GLuint texture_id, GLuint vertexbuffer, GLuint uvbuffer, GLuint normalbuffer) {
+    virtual void Draw(const std::vector<GLuint>& texture_ids, GLuint vertexbuffer, GLuint uvbuffer, GLuint normalbuffer) {
         glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
         glBufferData(GL_ARRAY_BUFFER, vertices_.size() * sizeof(glm::vec3), &vertices_[0], GL_STATIC_DRAW);
 
@@ -46,16 +51,16 @@ public:
         glBufferData(GL_ARRAY_BUFFER, uvs_.size() * sizeof(glm::vec3), &uvs_[0], GL_STATIC_DRAW);
 
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texture_);
-        glUniform1i(texture_id, 0);
+        glBindTexture(GL_TEXTURE_2D, texture_[0]);
+        glUniform1i(texture_ids[0], 0);
 
         glEnableVertexAttribArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
         glEnableVertexAttribArray(1);
         glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*) 0);
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
         glDrawArrays(GL_TRIANGLES, 0, vertices_.size());
 
@@ -64,7 +69,7 @@ public:
     }
 
 protected:
-    GLuint texture_;
+    std::vector<GLuint> texture_;
     std::vector<glm::vec3> vertices_;
     std::vector<glm::vec2> uvs_;
     std::vector<glm::vec3> normals_;
@@ -73,23 +78,23 @@ protected:
 class Camera {
 public:
     explicit Camera(GLfloat horizontal_angle = 0.0f, GLfloat vertical_angle = 0.0f, GLfloat fov = 45.0f)
-            : horizontal_angle_(horizontal_angle), vertical_angle_(vertical_angle), fov_(fov) {}
+        : horizontal_angle_(horizontal_angle), vertical_angle_(vertical_angle), fov_(fov) {}
 
     virtual ~Camera() = default;
 
     virtual glm::vec3 CameraDirection() {
         return glm::vec3(
-                cos(vertical_angle_) * sin(horizontal_angle_),
-                sin(vertical_angle_),
-                cos(vertical_angle_) * cos(horizontal_angle_)
+            cos(vertical_angle_) * sin(horizontal_angle_),
+            sin(vertical_angle_),
+            cos(vertical_angle_) * cos(horizontal_angle_)
         );
     }
 
     virtual glm::vec3 CameraRight() {
         return glm::vec3(
-                sin(horizontal_angle_ - 3.14f / 2.0f),
-                0,
-                cos(horizontal_angle_ - 3.14f / 2.0f)
+            sin(horizontal_angle_ - 3.14f / 2.0f),
+            0,
+            cos(horizontal_angle_ - 3.14f / 2.0f)
         );
     }
 
@@ -110,10 +115,10 @@ protected:
 class Object : public LoadedModel {
 public:
     explicit Object(const glm::vec3& position, const glm::vec3& direction,
-                    GLfloat box, GLfloat speed,
-                    const std::string& obj_file, const std::string& texture_file)
-            : position_(position), direction_(direction), box_(box), speed_(speed),
-              LoadedModel(obj_file, texture_file) {}
+        GLfloat box, GLfloat speed,
+        const std::string& obj_file, const std::vector<std::string>& texture_files)
+        : position_(position), direction_(direction), box_(box), speed_(speed),
+        LoadedModel(obj_file, texture_files) {}
 
     ~Object() override = default;
 
@@ -147,7 +152,7 @@ protected:
 class Floor : public Object {
 public:
     explicit Floor(const glm::vec3& position)
-            : Object(position, glm::vec3(0.0f, 1.0f, 0.0f), 1000.0f, 0.0f, "floor.obj", "blood.bmp") {}
+        : Object(position, glm::vec3(0.0f, 1.0f, 0.0f), 1000.0f, 0.0f, "floor.obj", { "blood.bmp" }) {}
 
     ~Floor() override = default;
 
@@ -165,8 +170,8 @@ public:
 class Actor : public Object {
 public:
     explicit Actor(const glm::vec3& position, GLfloat box, GLfloat hp, GLfloat speed,
-                   const glm::vec3& direction)
-            : Object(position, direction, box, speed, "monkey.obj", "zombie.bmp"), hp_(hp) {}
+        const glm::vec3& direction)
+        : Object(position, direction, box, speed, "Wolf_One_obj.obj", { "Wolf_Fur.bmp", "Wolf_Body.bmp", "Wolf_Eyes_1.bmp", "Wolf_Eyes_2.bmp" }), hp_(hp) {}
 
     ~Actor() override = default;
 
@@ -183,8 +188,8 @@ protected:
 class Enemy : public Actor {
 public:
     explicit Enemy(const glm::vec3& position, const glm::vec3& direction = glm::vec3(0.0f, 0.0f, 0.0f),
-                   GLfloat box = 1.0f, GLfloat hp = 1.0f, GLfloat speed = 10.0f, GLfloat interact_damage = 1.0f)
-            : Actor(position, box, hp, speed, direction), interact_damage_(interact_damage) {}
+        GLfloat box = 1.0f, GLfloat hp = 1.0f, GLfloat speed = 10.0f, GLfloat interact_damage = 1.0f)
+        : Actor(position, box, hp, speed, direction), interact_damage_(interact_damage) {}
 
     ~Enemy() override = default;
 
@@ -193,6 +198,41 @@ public:
     Object* Act(const std::vector<Object*>& objects) override;
 
     GLfloat DealDamage(Object* obj) { return interact_damage_; };
+
+    virtual void Draw(const std::vector<GLuint>& texture_ids, GLuint vertexbuffer, GLuint uvbuffer, GLuint normalbuffer) override {
+        glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+        glBufferData(GL_ARRAY_BUFFER, vertices_.size() * sizeof(glm::vec3), &vertices_[0], GL_STATIC_DRAW);
+
+        glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
+        glBufferData(GL_ARRAY_BUFFER, uvs_.size() * sizeof(glm::vec3), &uvs_[0], GL_STATIC_DRAW);
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture_[0]);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, texture_[1]);
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, texture_[2]);
+        glActiveTexture(GL_TEXTURE3);
+        glBindTexture(GL_TEXTURE_2D, texture_[3]);
+        glUniform1i(texture_ids[0], 0);
+        glUniform1i(texture_ids[1], 0);
+        glUniform1i(texture_ids[2], 0);
+        glUniform1i(texture_ids[3], 0);
+
+        glEnableVertexAttribArray(0);
+        glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+        glEnableVertexAttribArray(1);
+        glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+        glDrawArrays(GL_TRIANGLES, 0, vertices_.size());
+
+        glDisableVertexAttribArray(0);
+        glDisableVertexAttribArray(1);
+    }
+
 private:
     GLfloat interact_damage_;
 };
@@ -200,9 +240,9 @@ private:
 class FireBall : public Object {
 public:
     explicit FireBall(const glm::vec3& position, const glm::vec3& direction, GLfloat box = 0.1f,
-                        GLfloat damage = 1.0f, GLfloat speed = 10.0f, GLfloat tl = 10.0f)
-            : Object(position, direction, box, speed, "bullet.obj", "fire.bmp"),
-              damage_(damage), end_time_(glfwGetTime() + tl) {}
+        GLfloat damage = 1.0f, GLfloat speed = 10.0f, GLfloat tl = 10.0f)
+        : Object(position, direction, box, speed, "bullet.obj", {"fire.bmp"}),
+        damage_(damage), end_time_(glfwGetTime() + tl) {}
 
     ~FireBall() override = default;
 
@@ -224,10 +264,10 @@ protected:
 class Player : public Actor, public Camera {
 public:
     explicit Player(const glm::vec3& position = glm::vec3(0.0f, 2.0f, 0.0f),
-                    GLfloat box = 1.0f, GLfloat hp = 10.0f, GLfloat speed = 5.0f, GLfloat mouse_speed = 0.005f,
-                    GLfloat cooldown = 0.2f, size_t killed = 0)
-            : Actor(position, box, hp, speed, glm::vec3(0.0f, 0.0f, 0.0f)),
-              mouse_speed_(mouse_speed), cooldown_(cooldown) {}
+        GLfloat box = 1.0f, GLfloat hp = 10.0f, GLfloat speed = 5.0f, GLfloat mouse_speed = 0.005f,
+        GLfloat cooldown = 0.2f, size_t killed = 0)
+        : Actor(position, box, hp, speed, glm::vec3(0.0f, 0.0f, 0.0f)),
+        mouse_speed_(mouse_speed), cooldown_(cooldown) {}
 
     ~Player() override = default;
 
@@ -256,19 +296,19 @@ public:
             if (glfwGetTime() > next_projectile_) {
                 next_projectile_ = glfwGetTime() + cooldown_;
                 FireBall* new_proj = new FireBall(position_ + camera_direction * (box_ + 0.2f),
-                                                      camera_direction, 0.1f, 1.0f, 20.0);
+                    camera_direction, 0.1f, 1.0f, 20.0);
                 return new_proj;
             }
         }
 
         glm::vec3 direction(
-            sin( horizontal_angle_ ),
+            sin(horizontal_angle_),
             0.0f,
-            cos( horizontal_angle_ )
+            cos(horizontal_angle_)
         );
         glm::vec3 right = CameraRight();
         glm::vec3 up = CameraUp();
-        glm::vec3 final_direction = glm::vec3( 0.0f, 0.0f, 0.0f );
+        glm::vec3 final_direction = glm::vec3(0.0f, 0.0f, 0.0f);
 
 
         if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
@@ -289,8 +329,8 @@ public:
         if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
             final_direction -= up;
         }
-        if( glm::length( final_direction ) > 0.0f ) {
-            final_direction /= glm::length( final_direction );
+        if (glm::length(final_direction) > 0.0f) {
+            final_direction /= glm::length(final_direction);
         }
         direction_ = final_direction;
         return nullptr;
@@ -315,7 +355,8 @@ bool Actor::Interact(Object* obj, const glm::vec3& old_position) {
             position_ = old_position;
         }
         return hp_ > 0.0f;
-    } else {
+    }
+    else {
         return true;
     }
 }
@@ -326,7 +367,8 @@ bool FireBall::Interact(Object* obj, const glm::vec3& old_position) {
             return false;
         }
         return dynamic_cast<Floor*>(obj) == nullptr;
-    } else {
+    }
+    else {
         return true;
     }
 }
@@ -346,7 +388,8 @@ bool Enemy::Interact(Object* obj, const glm::vec3& old_position) {
             position_ = old_position;
         }
         return hp_ > 0.0f;
-    } else {
+    }
+    else {
         return true;
     }
 }
@@ -393,10 +436,10 @@ Object* Floor::Act(const std::vector<Object*>& objects) {
 class EnemyCreator {
 public:
     explicit EnemyCreator(GLfloat cooldown = 3.0f, size_t retries = 10, GLfloat r_from = 30.0f,
-                          GLfloat r_to = 50.0f, GLfloat hp_from = 1.0f, GLfloat hp_to = 5.0f,
-                          GLfloat speed_from = 1.0f, GLfloat speed_to = 5.0f)
-            : cooldown_(cooldown), rng_(std::random_device()()), retries_(retries), angle_(-3.14, 3.14),
-              r_(r_from, r_to), hp_(hp_from, hp_to), speed_(speed_from, speed_to) {}
+        GLfloat r_to = 50.0f, GLfloat hp_from = 1.0f, GLfloat hp_to = 5.0f,
+        GLfloat speed_from = 1.0f, GLfloat speed_to = 5.0f)
+        : cooldown_(cooldown), rng_(std::random_device()()), retries_(retries), angle_(-3.14, 3.14),
+        r_(r_from, r_to), hp_(hp_from, hp_to), speed_(speed_from, speed_to) {}
 
     Object* CreateEnemy(const glm::vec3& position, const std::vector<Object*>& objects) {
         if (glfwGetTime() > next_creation_) {
@@ -404,17 +447,17 @@ public:
 
             GLfloat angle_direction = angle_(rng_);
             glm::vec3 orientation(
-                    sin(angle_direction),
-                    0.0f,
-                    cos(angle_direction)
+                sin(angle_direction),
+                0.0f,
+                cos(angle_direction)
             );
 
             for (size_t retry = 0; retry < retries_; ++retry) {
                 GLfloat angle_position = angle_(rng_);
                 glm::vec3 direction(
-                        sin(angle_position),
-                        0.0f,
-                        cos(angle_position)
+                    sin(angle_position),
+                    0.0f,
+                    cos(angle_position)
                 );
 
                 GLfloat r = r_(rng_);
@@ -463,7 +506,9 @@ int main() {
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    window = glfwCreateWindow(1366, 768, "Attack on zombie monkeys", nullptr, nullptr);
+    int width = 3840, height = 2160;
+
+    window = glfwCreateWindow(width, height, "Attack on zombie monkeys", nullptr, nullptr);
     if (window == nullptr) {
         fprintf(stderr, "Failed to open GLFW window.\n");
         getchar();
@@ -484,7 +529,7 @@ int main() {
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     glfwPollEvents();
-    glfwSetCursorPos(window, 1366 / 2, 768 / 2);
+    glfwSetCursorPos(window, width / 2, height / 2);
 
     glClearColor(0.00f, 191 / 255.f, 1.0f, 0.0f);
 
@@ -496,8 +541,13 @@ int main() {
     glBindVertexArray(VertexArrayID);
 
     GLuint simpleProgramID = LoadShaders("ColorVertex.vertexshader", "ColorFragment.fragmentshader");
+    GLuint simpleProgramID2 = LoadShaders("ColorVertex.vertexshader", "ColorFragment2.fragmentshader");
 
     GLuint SimpleTextureID = glGetUniformLocation(simpleProgramID, "TextureSampler");
+    GLuint SimpleTextureID1 = glGetUniformLocation(simpleProgramID2, "TextureSampler1");
+    GLuint SimpleTextureID2 = glGetUniformLocation(simpleProgramID2, "TextureSampler2");
+    GLuint SimpleTextureID3 = glGetUniformLocation(simpleProgramID2, "TextureSampler3");
+    GLuint SimpleTextureID4 = glGetUniformLocation(simpleProgramID2, "TextureSampler4");
     GLuint SimpleMVPID = glGetUniformLocation(simpleProgramID, "MVP");
 
     GLuint vertexbuffer;
@@ -557,7 +607,8 @@ int main() {
         for (size_t i = 0; i < objects.size(); ++i) {
             if (remains[i]) {
                 new_objects.push_back(objects[i]);
-            } else {
+            }
+            else {
                 delete objects[i];
             }
         }
@@ -581,9 +632,9 @@ int main() {
 
         glm::mat4 Projection = glm::perspective(glm::radians(player->FOV()), 4.0f / 3.0f, player->Box(), 300.0f);
         glm::mat4 View = glm::lookAt(
-                player->Position(),
-                player->Position() + player->CameraDirection(),
-                player->CameraUp()
+            player->Position(),
+            player->Position() + player->CameraDirection(),
+            player->CameraUp()
         );
 
         glUseProgram(simpleProgramID);
@@ -605,7 +656,15 @@ int main() {
             glm::mat4 MVP = Projection * View * Model;
             glUniformMatrix4fv(SimpleMVPID, 1, GL_FALSE, &MVP[0][0]);
 
-            obj->Draw(SimpleTextureID, vertexbuffer, uvbuffer, normalbuffer);
+            auto casted_obj = dynamic_cast<Enemy*>(obj);
+            if (casted_obj != nullptr) {
+                casted_obj->Draw({ SimpleTextureID1, SimpleTextureID2, SimpleTextureID3, SimpleTextureID4}, vertexbuffer, uvbuffer, normalbuffer);
+            }
+            else {
+                obj->Draw({ SimpleTextureID }, vertexbuffer, uvbuffer, normalbuffer);
+            }
+
+            
 
         }
 
@@ -613,7 +672,7 @@ int main() {
         glfwPollEvents();
 
     } while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
-             glfwWindowShouldClose(window) == 0);
+        glfwWindowShouldClose(window) == 0);
 
     for (Object* obj : objects) {
         delete obj;
