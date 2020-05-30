@@ -12,7 +12,8 @@ public class AddStickerButtonHandler : MonoBehaviour
     private float timeLeft = kSecPerFrame;
     public Sprite[] sprites = new Sprite[kSpritesCount];
     public Image image;
-    public UnityEngine.UI.Button button;
+    public Button button;
+    public Canvas insertTextCanvas;
 
     void Start()
     {
@@ -31,6 +32,6 @@ public class AddStickerButtonHandler : MonoBehaviour
 
     private void OnClick()
     {
-        
+        insertTextCanvas.enabled = true;
     }
 }

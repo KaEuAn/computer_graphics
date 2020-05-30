@@ -1,30 +1,28 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class TextCreator : MonoBehaviour
 {
-
-    public string text;
-
+    public TMP_Text imageText;
+    public InsertTextCanvasHandler insertTextHandler;
     public TextHandler parentHandler;
-
     public bool usingNewText = false;
 
     void Start()
     {
-        parentHandler = this.transform.parent.GetComponent<TextHandler>();
     }
 
     void Update()
     {
-        if (Input.GetKeyDown("space"))
+        if (imageText.text != insertTextHandler.currentText)
         {
-            GetComponent<TextMesh>().text = text;
+            imageText.text = insertTextHandler.currentText;
         }
-        if (!(parentHandler.text is null) & ! usingNewText)
+        if (!(parentHandler.text is null) && !usingNewText)
         {
-            text = parentHandler.text;
+            imageText.text = parentHandler.text;
         }
     }
 }

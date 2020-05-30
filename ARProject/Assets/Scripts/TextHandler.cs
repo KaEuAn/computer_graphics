@@ -5,7 +5,7 @@ using UnityEngine;
 public class TextHandler : MonoBehaviour
 {
     public string text = null;
-    public string name = "wall3";
+    public string targetImageName = "wall3";
 
 
     // Update is called once per frame
@@ -14,7 +14,7 @@ public class TextHandler : MonoBehaviour
         GoogleApi googleApi = GameObject.Find("ARCamera").GetComponent<GoogleApi>();
         if (! (googleApi.text_for_walls is null))
         {
-            text = googleApi.text_for_walls[name];
+            text = googleApi.text_for_walls[targetImageName];
         }
     }
 }
