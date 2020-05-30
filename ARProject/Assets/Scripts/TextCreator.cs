@@ -5,7 +5,7 @@ using UnityEngine;
 public class TextCreator : MonoBehaviour
 {
 
-    public string text = null;
+    public string text;
 
     public TextHandler parentHandler;
 

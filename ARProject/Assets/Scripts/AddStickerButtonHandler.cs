@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using System.Windows.Forms;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -32,6 +31,6 @@ public class AddStickerButtonHandler : MonoBehaviour
 
     private void OnClick()
     {
-        MessageBox.Show("Как поспал, братишка?", "Hello!", MessageBoxButtons.OK);
+        
     }
 }
