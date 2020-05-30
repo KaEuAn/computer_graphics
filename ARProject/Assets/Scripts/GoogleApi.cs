@@ -5,22 +5,19 @@ using UnityGoogleDrive.Data;
 
 public class GoogleApi : MonoBehaviour
 {
-    public int len = -1;
-    public string name = "wall3";
-    public UnityGoogleDrive.Data.FileList list;
-    public List<File> LFile;
+    private List<File> files;
+    public string filename = "";
 
     void Start()
     {
-        GoogleDriveFiles.List().Send().OnDone += fileList => list = fileList;
+        GoogleDriveFiles.List().Send().OnDone += fileList => files = fileList.Files;
     }
 
     void Update()
     {
-        if (!list.Equals(null))
+        if (!(files is null) && files.Count != 0 && filename.Length == 0)
         {
-            LFile = list.Files;
-            len = LFile.Count;
+            filename = files[0].Name;
         }
     }
 }
