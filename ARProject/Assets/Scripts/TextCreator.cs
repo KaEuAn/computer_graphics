@@ -5,10 +5,15 @@ using UnityEngine;
 public class TextCreator : MonoBehaviour
 {
 
-    public string text = "xxxVanya petuhxxx";
+    public string text = null;
+
+    public TextHandler parentHandler;
+
+    public bool usingNewText = false;
 
     void Start()
     {
+        parentHandler = this.transform.parent.GetComponent<TextHandler>();
     }
 
     void Update()
@@ -16,6 +21,10 @@ public class TextCreator : MonoBehaviour
         if (Input.GetKeyDown("space"))
         {
             GetComponent<TextMesh>().text = text;
+        }
+        if (!(parentHandler.text is null) & ! usingNewText)
+        {
+            text = parentHandler.text;
         }
     }
 }

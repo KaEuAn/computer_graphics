@@ -12,7 +12,7 @@ public class GoogleApi : MonoBehaviour
     private List<UnityGoogleDrive.Data.File> files;
     public UnityGoogleDrive.Data.File keyfile = null;
     public string json;
-    public Dictionary<string, string> text_for_walls;
+    public Dictionary<string, string> text_for_walls = null;
 
 
     void Start()
