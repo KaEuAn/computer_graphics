@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityGoogleDrive;
 
-public class TestAboutGet : AdaptiveWindowGUI
+public class GoogleApi : AdaptiveWindowGUI
 {
     private GoogleDriveAbout.GetRequest request;
     private GoogleDriveSettings settings;
