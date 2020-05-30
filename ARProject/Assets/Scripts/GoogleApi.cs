@@ -1,59 +1,26 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityGoogleDrive;
+using UnityGoogleDrive.Data;
 
-public class GoogleApi : AdaptiveWindowGUI
+public class GoogleApi : MonoBehaviour
 {
-    private GoogleDriveAbout.GetRequest request;
-    private GoogleDriveSettings settings;
-
+    public int len = -1;
     public string name = "wall3";
+    public UnityGoogleDrive.Data.FileList list;
+    public List<File> LFile;
 
-    protected override void Awake()
+    void Start()
     {
-        base.Awake();
-        settings = GoogleDriveSettings.LoadFromResources();
+        GoogleDriveFiles.List().Send().OnDone += fileList => list = fileList;
     }
 
-    private void Start()
+    void Update()
     {
-        UpdateInfo();
-    }
-
-    protected override void OnWindowGUI(int windowId)
-    {
-        if (request.IsRunning)
+        if (!list.Equals(null))
         {
-            GUILayout.Label($"Loading: {request.Progress:P2}");
+            LFile = list.Files;
+            len = LFile.Count;
         }
-        else
-        {
-            if (GUILayout.Button("Refresh"))
-                UpdateInfo();
-        }
-
-        if (settings.IsAnyAuthTokenCached() && GUILayout.Button("Delete Cached Tokens"))
-            settings.DeleteCachedAuthTokens();
-
-        if (request.ResponseData != null)
-        {
-            GUILayout.Label(string.Format("User name: {0}\nUser email: {1}\nSpace used: {2:0}/{3:0} MB",
-                request.ResponseData.User.DisplayName,
-                request.ResponseData.User.EmailAddress,
-                request.ResponseData.StorageQuota.Usage * .000001f,
-                request.ResponseData.StorageQuota.Limit * .000001f));
-        }
-
-        if (request.IsError)
-            GUILayout.Label(string.Format("Request failed: {0}", request.Error));
-    }
-
-    private void UpdateInfo()
-    {
-        AuthController.CancelAuth();
-
-        request = GoogleDriveAbout.Get();
-        request.Fields = new List<string> { "user", "storageQuota" };
-        request.Send();
     }
 }
