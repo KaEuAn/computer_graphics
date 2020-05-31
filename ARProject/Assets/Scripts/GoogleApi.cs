@@ -57,9 +57,9 @@ public class GoogleApi : MonoBehaviour
 
     void RefreshFileList(FileList fileList)
     {
-        fileStatus = EDownloadStatus.kFilesListRefreshed;
         files = fileList.Files;
         Debug.Log("File list refreshed, found " + files.Count.ToString() + " files");
+        fileStatus = EDownloadStatus.kFilesListRefreshed;
     }
 
     void DownloadFile(File file)
