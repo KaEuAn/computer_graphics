@@ -19,18 +19,15 @@ public class GoogleApi : MonoBehaviour
     void Start()
     {
         GoogleDriveFiles.List().Send().OnDone += fileList => files = fileList.Files;
-        Debug.Log("suka");
         //should change to Update if delete file during usage;
     }
 
     void Update()
     {
-        Debug.Log(file.Count);
         if (!(files is null) && files.Count != 0 && keyfile is null)
         {
             keyfile = files[0];
             GoogleDriveFiles.Download(keyfile.Id).Send().OnDone += file => text_for_walls = JsonConvert.DeserializeObject<Dictionary<string, string>>(Encoding.UTF8.GetString(file.Content));
-            Debug.Log("got text_for_walls " + text_for_walls["wall3"]);
         }
         if (hasChanges)
         {

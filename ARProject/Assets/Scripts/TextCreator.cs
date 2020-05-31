@@ -18,7 +18,7 @@ public class TextCreator : MonoBehaviour
 
     void Update()
     {
-        if (!(insertTextHandler.currentText is null) & imageText.text != insertTextHandler.currentText)
+        if (!(insertTextHandler.currentText is null) && imageText.text != insertTextHandler.currentText)
         {
             imageText.text = insertTextHandler.currentText;
             parentHandler.newText = imageText.text;

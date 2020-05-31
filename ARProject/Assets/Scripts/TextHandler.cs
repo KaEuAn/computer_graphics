@@ -18,12 +18,12 @@ public class TextHandler : MonoBehaviour
     void Update()
     {
         
-        if (! (googleApi.text_for_walls is null))
+        if (! (googleApi.text_for_walls is null) && !(text is null))
         {
             text = googleApi.text_for_walls[targetImageName];
         }
 
-        if (!(newText is null)) {
+        if (!(newText is null) && !(googleApi.text_for_walls is null)) {
             googleApi.text_for_walls[targetImageName] = newText;
             text = newText;
             newText = null;
