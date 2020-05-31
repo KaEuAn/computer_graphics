@@ -13,18 +13,25 @@ public class TextCreator : MonoBehaviour
 
     void Start()
     {
-        googleApi = GameObject.Find("ARCamera").GetComponent<GoogleApi>();
     }
 
     void Update()
     {
-        if (!(insertTextHandler.currentText is null) && imageText.text != insertTextHandler.currentText)
+        if (parentHandler.text is null)
+        {
+            Debug.LogWarning("Parent TextHandler is not ready yet!");
+            return;
+        }
+
+        if (insertTextHandler.updateText && parentHandler.targetImageEnum == insertTextHandler.currentWall)
         {
             imageText.text = insertTextHandler.currentText;
             parentHandler.newText = imageText.text;
+            insertTextHandler.updateText = false;
+            parentHandler.updateText = true;
             usingNewText = true;
         }
-        if (!(parentHandler.text is null) && !usingNewText)
+        if (!usingNewText)
         {
             imageText.text = parentHandler.text;
         }

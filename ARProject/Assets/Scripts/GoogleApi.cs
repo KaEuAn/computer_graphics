@@ -7,14 +7,11 @@ using Newtonsoft.Json;
 
 public class GoogleApi : MonoBehaviour
 {
-
-
-    private List<UnityGoogleDrive.Data.File> files;
-    public UnityGoogleDrive.Data.File keyfile = null;
-    public string json;
-    public Dictionary<string, string> text_for_walls = null;
+    private List<File> files;
+    private string json;
+    public File keyfile = null;
+    public Dictionary<string, string> textForWalls = null;
     public bool hasChanges = false;
-
 
     void Start()
     {
@@ -27,13 +24,24 @@ public class GoogleApi : MonoBehaviour
         if (!(files is null) && files.Count != 0 && keyfile is null)
         {
             keyfile = files[0];
-            GoogleDriveFiles.Download(keyfile.Id).Send().OnDone += file => { text_for_walls = JsonConvert.DeserializeObject<Dictionary<string, string>>(Encoding.UTF8.GetString(file.Content)); keyfile = file; } ;
+            GoogleDriveFiles.Download(keyfile.Id).Send().OnDone += DownloadFile;
         }
-        if (hasChanges)
+        if (hasChanges && !(textForWalls is null))
         {
-            keyfile.Content = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(text_for_walls));
-            GoogleDriveFiles.Update(keyfile.Id, keyfile).Send();
+            json = JsonConvert.SerializeObject(textForWalls);
+            Debug.Log("Uploading json " + json);
+            keyfile.Content = Encoding.UTF8.GetBytes(json);
+            var updateFile = new File() { Content = keyfile.Content };
+            GoogleDriveFiles.Update(keyfile.Id, updateFile).Send();
             hasChanges = false;
         }
+    }
+
+    void DownloadFile(File file)
+    {
+        json = Encoding.UTF8.GetString(file.Content);
+        Debug.Log("Downloading json " + json);
+        textForWalls = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
+        keyfile = file;
     }
 }

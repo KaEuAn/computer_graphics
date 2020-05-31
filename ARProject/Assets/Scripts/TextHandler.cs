@@ -6,27 +6,28 @@ public class TextHandler : MonoBehaviour
 {
     public string text = null;
     public string newText = null;
-    public string targetImageName = "wall3";
+    public bool updateText = false;
+    public EWall targetImageEnum = EWall.kWall6;
     public GoogleApi googleApi;
 
-    void Start()
-    {
-        googleApi = GameObject.Find("ARCamera").GetComponent<GoogleApi>();
-    }
-
-    // Update is called once per frame
     void Update()
     {
-        
-        if (!(googleApi.text_for_walls is null) && (text is null))
+        bool googleApiActive = !(googleApi.textForWalls is null);
+        if (!googleApiActive)
         {
-            text = googleApi.text_for_walls[targetImageName];
+            Debug.LogWarning("Google Api is not initialized yet!");
+            return;
         }
 
-        if (!(newText is null) && !(googleApi.text_for_walls is null)) {
-            googleApi.text_for_walls[targetImageName] = newText;
+        if (text is null || text.Length == 0)
+        {
+            text = googleApi.textForWalls[targetImageEnum.GetName()];
+        }
+
+        if (updateText) {
+            googleApi.textForWalls[targetImageEnum.GetName()] = newText;
             text = newText;
-            newText = null;
+            updateText = false;
             googleApi.hasChanges = true;
         }
     }
