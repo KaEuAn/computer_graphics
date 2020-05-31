@@ -10,7 +10,7 @@ public class TextHandler : MonoBehaviour
     public bool checkoutText = false;
     public EWall targetImageEnum = EWall.kWall6;
     public GoogleApi googleApi;
-
+    
     void Update()
     {
         if (googleApi.textForWalls is null)

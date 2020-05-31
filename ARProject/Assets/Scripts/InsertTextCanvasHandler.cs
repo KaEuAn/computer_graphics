@@ -47,6 +47,8 @@ public class InsertTextCanvasHandler : MonoBehaviour
     public string currentText = null;
     public EWall currentWall = EWall.kWall6;
 
+    public string stringResult;
+
     void Start()
     {
         canvas.enabled = false;
@@ -56,7 +58,11 @@ public class InsertTextCanvasHandler : MonoBehaviour
     }
 
     void Update()
-    {   
+    {
+        if (Input.GetKeyDown("space")) 
+        { 
+            StartCoroutine(MakePictureRequest("i")); 
+        }
     }
 
     private void OnSubmit()
