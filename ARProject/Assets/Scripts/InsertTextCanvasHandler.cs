@@ -10,14 +10,13 @@ public class InsertTextCanvasHandler : MonoBehaviour
     public Button submitButton;
     public Button cancelButton;
     public TMP_InputField input;
-    public string currentText;
+    public string currentText = null;
 
     void Start()
     {
         canvas.enabled = false;
         submitButton.onClick.AddListener(OnSubmit);
         cancelButton.onClick.AddListener(OnCancel);
-        currentText = input.text;
     }
 
     void Update()
@@ -33,7 +32,7 @@ public class InsertTextCanvasHandler : MonoBehaviour
 
     private void OnCancel()
     {
-        input.text = currentText;
+        input.text = null;
         canvas.enabled = false;
     }
 }
