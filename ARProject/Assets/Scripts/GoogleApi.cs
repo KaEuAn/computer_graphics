@@ -27,12 +27,12 @@ public class GoogleApi : MonoBehaviour
         if (!(files is null) && files.Count != 0 && keyfile is null)
         {
             keyfile = files[0];
-            GoogleDriveFiles.Download(keyfile.Id).Send().OnDone += file => text_for_walls = JsonConvert.DeserializeObject<Dictionary<string, string>>(Encoding.UTF8.GetString(file.Content));
+            GoogleDriveFiles.Download(keyfile.Id).Send().OnDone += file => { text_for_walls = JsonConvert.DeserializeObject<Dictionary<string, string>>(Encoding.UTF8.GetString(file.Content)); keyfile = file; } ;
         }
         if (hasChanges)
         {
-            var file = new UnityGoogleDrive.Data.File { Name = "keys.json", Content = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(text_for_walls)) };
-            GoogleDriveFiles.Create(file).Send();
+            keyfile.Content.set(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(text_for_walls)));
+            GoogleDriveFiles.Update(keyfile.Id, keyfile).Send();
             hasChanges = false;
         }
     }
