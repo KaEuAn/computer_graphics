@@ -31,7 +31,7 @@ public class GoogleApi : MonoBehaviour
         }
         if (hasChanges)
         {
-            keyfile.Content.set(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(text_for_walls)));
+            keyfile.Content = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(text_for_walls));
             GoogleDriveFiles.Update(keyfile.Id, keyfile).Send();
             hasChanges = false;
         }
