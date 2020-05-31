@@ -12,12 +12,13 @@ public class AddStickerButtonHandler : MonoBehaviour
     private float timeLeft = kSecPerFrame;
     public Sprite[] sprites = new Sprite[kSpritesCount];
     public Image image;
-    public Button button;
+    public Button addStickerButton;
+    public Button refreshButton;
     public Canvas insertTextCanvas;
 
     void Start()
     {
-        button.onClick.AddListener(OnClick);
+        addStickerButton.onClick.AddListener(OnClick);
     }
    
     void Update()
@@ -33,5 +34,6 @@ public class AddStickerButtonHandler : MonoBehaviour
     private void OnClick()
     {
         insertTextCanvas.enabled = true;
+        refreshButton.enabled = false;
     }
 }

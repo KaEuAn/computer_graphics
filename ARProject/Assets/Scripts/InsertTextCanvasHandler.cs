@@ -12,7 +12,7 @@ public enum EWall
     kWall6,
 }
 
-public static class Extensions
+public static class WallExtensions
 {
     public static string GetName(this EWall wall)
     {
@@ -40,8 +40,10 @@ public class InsertTextCanvasHandler : MonoBehaviour
     public Canvas canvas;
     public Button submitButton;
     public Button cancelButton;
+    public Button refreshButton;
     public TMP_InputField input;
     public bool updateText = false;
+    public bool downloadText = false;
     public string currentText = null;
     public EWall currentWall = EWall.kWall6;
 
@@ -50,6 +52,7 @@ public class InsertTextCanvasHandler : MonoBehaviour
         canvas.enabled = false;
         submitButton.onClick.AddListener(OnSubmit);
         cancelButton.onClick.AddListener(OnCancel);
+        refreshButton.onClick.AddListener(OnRefresh);
     }
 
     void Update()
@@ -62,12 +65,19 @@ public class InsertTextCanvasHandler : MonoBehaviour
         updateText = true;
 
         canvas.enabled = false;
+        refreshButton.enabled = true;
         input.text = "";
     }
 
     private void OnCancel()
     {
         canvas.enabled = false;
+        refreshButton.enabled = true;
         input.text = "";
+    }
+
+    private void OnRefresh()
+    {
+        downloadText = true;
     }
 }

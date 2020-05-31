@@ -23,6 +23,11 @@ public class TextCreator : MonoBehaviour
             return;
         }
 
+        if (insertTextHandler.downloadText && !insertTextHandler.updateText)
+        {
+            // todo
+            insertTextHandler.downloadText = false;
+        }
         if (insertTextHandler.updateText && parentHandler.targetImageEnum == insertTextHandler.currentWall)
         {
             imageText.text = insertTextHandler.currentText;
