@@ -17,6 +17,7 @@ public class InsertTextCanvasHandler : MonoBehaviour
         canvas.enabled = false;
         submitButton.onClick.AddListener(OnSubmit);
         cancelButton.onClick.AddListener(OnCancel);
+        currentText = input.text;
     }
 
     void Update()

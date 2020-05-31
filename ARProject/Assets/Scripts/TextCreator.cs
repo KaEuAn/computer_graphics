@@ -5,7 +5,7 @@ using TMPro;
 
 public class TextCreator : MonoBehaviour
 {
-    public TMP_Text imageText;
+    public TextMeshPro imageText;
     public InsertTextCanvasHandler insertTextHandler;
     public TextHandler parentHandler;
     public bool usingNewText = false;
