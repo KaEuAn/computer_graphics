@@ -43,7 +43,7 @@ public class InsertTextCanvasHandler : MonoBehaviour
     public Button refreshButton;
     public TMP_InputField input;
     public bool updateText = false;
-    public bool downloadText = false;
+    public bool downloadText = true;
     public string currentText = null;
     public EWall currentWall = EWall.kWall6;
 

@@ -7,20 +7,21 @@ public class TextHandler : MonoBehaviour
     public string text = null;
     public string newText = null;
     public bool updateText = false;
+    public bool checkoutText = false;
     public EWall targetImageEnum = EWall.kWall6;
     public GoogleApi googleApi;
 
     void Update()
     {
-        bool googleApiActive = !(googleApi.textForWalls is null);
-        if (!googleApiActive)
+        if (googleApi.textForWalls is null)
         {
             Debug.LogWarning("Google Api is not initialized yet!");
             return;
         }
 
-        if (text is null || text.Length == 0)
+        if (checkoutText && googleApi.fileStatus == GoogleApi.EDownloadStatus.kDownloaded)
         {
+            checkoutText = false;
             text = googleApi.textForWalls[targetImageEnum.GetName()];
         }
 

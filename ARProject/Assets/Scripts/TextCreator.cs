@@ -8,8 +8,8 @@ public class TextCreator : MonoBehaviour
     public TextMeshPro imageText;
     public InsertTextCanvasHandler insertTextHandler;
     public TextHandler parentHandler;
-    public bool usingNewText = false;
     public GoogleApi googleApi;
+    private bool waitForParentHanlerText = false;
 
     void Start()
     {
@@ -17,28 +17,37 @@ public class TextCreator : MonoBehaviour
 
     void Update()
     {
+        if (insertTextHandler.downloadText && !insertTextHandler.updateText)
+        {
+            Debug.Log("File download requested");
+            googleApi.fileStatus = GoogleApi.EDownloadStatus.kDownloadRequested;
+            insertTextHandler.downloadText = false;
+            parentHandler.checkoutText = true;
+            waitForParentHanlerText = true;
+        }
         if (parentHandler.text is null)
         {
             Debug.LogWarning("Parent TextHandler is not ready yet!");
             return;
         }
 
-        if (insertTextHandler.downloadText && !insertTextHandler.updateText)
+        if (waitForParentHanlerText && !parentHandler.checkoutText)
         {
-            // todo
-            insertTextHandler.downloadText = false;
+            UpdateImageText(parentHandler.text);
+            waitForParentHanlerText = false;
         }
         if (insertTextHandler.updateText && parentHandler.targetImageEnum == insertTextHandler.currentWall)
         {
-            imageText.text = insertTextHandler.currentText;
+            UpdateImageText(insertTextHandler.currentText);
             parentHandler.newText = imageText.text;
             insertTextHandler.updateText = false;
             parentHandler.updateText = true;
-            usingNewText = true;
         }
-        if (!usingNewText)
-        {
-            imageText.text = parentHandler.text;
-        }
+    }
+
+    void UpdateImageText(string text)
+    {
+        imageText.text = text;
+        // todo: add image update
     }
 }
