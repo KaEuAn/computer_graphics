@@ -20,7 +20,7 @@ public class GoogleApi : MonoBehaviour
     public File keyfile = null;
     public Dictionary<string, string> textForWalls = null;
     public bool hasChanges = false;
-    public EDownloadStatus fileStatus = EDownloadStatus.kDownloaded;
+    public EDownloadStatus fileStatus = EDownloadStatus.kDownloadRequested;
 
     void Start()
     {
