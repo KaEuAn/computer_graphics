@@ -65,11 +65,11 @@ public class GoogleApi : MonoBehaviour
 
     void DownloadFile(File file)
     {
-        fileStatus = EDownloadStatus.kDownloaded;
         json = Encoding.UTF8.GetString(file.Content);
         Debug.Log("Downloading json " + json);
         textForWalls = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
         keyfile = file;
         textForWallReady = new Dictionary<EWall, bool>() { { EWall.kWall3, true }, { EWall.kWall4, true }, { EWall.kWall6, true }, };
+        fileStatus = EDownloadStatus.kDownloaded;
     }
 }
