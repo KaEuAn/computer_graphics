@@ -5,40 +5,49 @@ using TMPro;
 
 public class TextCreator : MonoBehaviour
 {
-    public TextMeshPro imageText;
+    public TextMeshPro stickerText;
+    public SpriteRenderer stickerSpriteRenderer;
     public InsertTextCanvasHandler insertTextHandler;
     public TextHandler parentHandler;
     public GoogleApi googleApi;
     private bool waitForParentHanlerText = false;
+    private const float targetImageSize = 1f;
 
-    IEnumerator MakePictureRequest()
+    IEnumerator MakePictureRequest(string text)
     {
-        if (picture is null)
+        if (text is null)
         {
             Debug.Log("nul in Picture REquest");
             yield return 0;
         }
-        string url = @"https://yandex.ru/images/search?text=" + imageText;
-        WWW request = new WWW(url);
+        string url = @"https://yandex.ru/images/search?text=" + text;
+        var request = new WWW(url);
         yield return request;
 
         if (request.error != null)
         {
             Debug.Log("request error: " + request.error);
+            yield return 0;
         }
-        else
+
+        var imageUrl = request.text;
+        string[] stringsForFind = { "<div class=\"serp - item serp", "\"url\":", "\"url\":", "\"url\":" };
+        foreach (string curString in stringsForFind)
         {
-            stringResult = request.text;
-            string[] stringsForFind = { "<div class=\"serp - item serp", "\"url\":", "\"url\":", "\"url\":" };
-            foreach (string curString in stringsForFind)
-            {
-                int ind = stringResult.IndexOf(curString);
-                stringResult = stringResult.Substring(ind + 7);
-            }
-            stringResult = stringResult.Substring(0, stringResult.IndexOf('"'));
-            Debug.Log("request success");
-            Debug.Log("returned data" + request.text);
+            int ind = imageUrl.IndexOf(curString);
+            imageUrl = imageUrl.Substring(ind + 7);
         }
+        imageUrl = imageUrl.Substring(0, imageUrl.IndexOf('"'));
+        Debug.Log("Image url: " + imageUrl);
+
+        var imageRequest = new WWW(imageUrl);
+        yield return imageRequest;
+        stickerSpriteRenderer.sprite = Sprite.Create(
+            imageRequest.texture,
+            new Rect(0, 0, imageRequest.texture.width, imageRequest.texture.height),
+            new Vector2(0.5f, 0.5f),
+            imageRequest.texture.height / targetImageSize
+        );
     }
 
     void Start()
@@ -69,7 +78,7 @@ public class TextCreator : MonoBehaviour
         if (insertTextHandler.updateText && parentHandler.targetImageEnum == insertTextHandler.currentWall)
         {
             UpdateImageText(insertTextHandler.currentText);
-            parentHandler.newText = imageText.text;
+            parentHandler.newText = stickerText.text;
             insertTextHandler.updateText = false;
             parentHandler.updateText = true;
         }
@@ -77,7 +86,7 @@ public class TextCreator : MonoBehaviour
 
     void UpdateImageText(string text)
     {
-        imageText.text = text;
-        // todo: add image update
+        stickerText.text = text;
+        StartCoroutine(MakePictureRequest(text));
     }
 }

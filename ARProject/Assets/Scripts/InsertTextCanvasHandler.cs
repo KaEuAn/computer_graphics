@@ -59,10 +59,6 @@ public class InsertTextCanvasHandler : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown("space")) 
-        { 
-            StartCoroutine(MakePictureRequest("i")); 
-        }
     }
 
     private void OnSubmit()
