@@ -21,6 +21,7 @@ public class GoogleApi : MonoBehaviour
     public Dictionary<string, string> textForWalls = null;
     public bool hasChanges = false;
     public EDownloadStatus fileStatus = EDownloadStatus.kDownloaded;
+    public Dictionary<EWall, bool> textForWallReady = new Dictionary<EWall, bool>() { { EWall.kWall3, true }, { EWall.kWall4, true }, { EWall.kWall6, true }, };
 
     void Start()
     {
@@ -69,5 +70,6 @@ public class GoogleApi : MonoBehaviour
         Debug.Log("Downloading json " + json);
         textForWalls = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
         keyfile = file;
+        textForWallReady = new Dictionary<EWall, bool>() { { EWall.kWall3, true }, { EWall.kWall4, true }, { EWall.kWall6, true }, };
     }
 }

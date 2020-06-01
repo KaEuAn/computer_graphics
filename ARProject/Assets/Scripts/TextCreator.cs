@@ -10,7 +10,6 @@ public class TextCreator : MonoBehaviour
     public InsertTextCanvasHandler insertTextHandler;
     public TextHandler parentHandler;
     public GoogleApi googleApi;
-    private bool waitForParentHanlerText = false;
     private const float targetImageSize = 1f;
 
     IEnumerator MakePictureRequest(string text)
@@ -62,7 +61,6 @@ public class TextCreator : MonoBehaviour
             googleApi.fileStatus = GoogleApi.EDownloadStatus.kDownloadRequested;
             insertTextHandler.downloadText = false;
             parentHandler.checkoutText = true;
-            waitForParentHanlerText = true;
         }
         if (parentHandler.text is null)
         {
@@ -70,21 +68,21 @@ public class TextCreator : MonoBehaviour
             return;
         }
 
-        if (waitForParentHanlerText && !parentHandler.checkoutText)
+        if (googleApi.textForWallReady[parentHandler.targetImageEnum] && !(googleApi.textForWalls is null))
         {
-            UpdateImageText(parentHandler.text);
-            waitForParentHanlerText = false;
+            googleApi.textForWallReady[parentHandler.targetImageEnum] = false;
+            UpdateImageAndText(googleApi.textForWalls[parentHandler.targetImageEnum.GetName()]);
         }
         if (insertTextHandler.updateText && parentHandler.targetImageEnum == insertTextHandler.currentWall)
         {
-            UpdateImageText(insertTextHandler.currentText);
+            UpdateImageAndText(insertTextHandler.currentText);
             parentHandler.newText = stickerText.text;
             insertTextHandler.updateText = false;
             parentHandler.updateText = true;
         }
     }
 
-    void UpdateImageText(string text)
+    private void UpdateImageAndText(string text)
     {
         stickerText.text = text;
         StartCoroutine(MakePictureRequest(text));
