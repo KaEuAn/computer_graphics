@@ -7,7 +7,7 @@ public class TextHandler : MonoBehaviour
     public string text = null;
     public string newText = null;
     public bool updateText = false;
-    public bool checkoutText = false;
+    public bool checkoutText = true;
     public EWall targetImageEnum = EWall.kWall6;
     public GoogleApi googleApi;
     

@@ -64,6 +64,11 @@ public class CustomTrackableEventHandler : MonoBehaviour, ITrackableEventHandler
             var canvasComponents = mTrackableBehaviour.GetComponentsInChildren<Canvas>(true);
             var textHandlers = mTrackableBehaviour.GetComponentsInChildren<TextHandler>(true);
 
+
+            // Update insertTextHandler
+            foreach (var component in textHandlers)
+                insertTextHandler.currentWall = component.targetImageEnum;
+
             // Enable rendering:
             foreach (var component in rendererComponents)
                 component.enabled = true;
@@ -76,9 +81,6 @@ public class CustomTrackableEventHandler : MonoBehaviour, ITrackableEventHandler
             foreach (var component in canvasComponents)
                 component.enabled = true;
 
-            // Update insertTextHandler
-            foreach (var component in textHandlers)
-                insertTextHandler.currentWall = component.targetImageEnum;
         }
     }
 
